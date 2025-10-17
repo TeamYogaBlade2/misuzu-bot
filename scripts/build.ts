@@ -16,6 +16,7 @@ const getEnv = (key: string) => {
 
 const envDefs: Record<`ESBUILDENV.${keyof typeof ESBUILDENV}`, string> = {
   'ESBUILDENV.APPID': getEnv('APPID'),
+  'ESBUILDENV.DASHBOARD_ISSUE_URL': `"${getEnv('DASHBOARD_ISSUE_URL')}"`,
   'ESBUILDENV.PRIVATE_KEY': `"${getEnv('PRIVATE_KEY').replaceAll('\n', '\\n')}"`,
   'ESBUILDENV.WEBHOOK_SECRET': `"${getEnv('WEBHOOK_SECRET')}"`,
 };
