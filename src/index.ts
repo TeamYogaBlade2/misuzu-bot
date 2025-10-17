@@ -31,7 +31,6 @@ const middleware = createWebMiddleware(app);
 
 export default {
   async fetch(req: Request): Promise<Response|undefined> {
-    const res = middleware(req);
-    return res;
+    return await middleware(req) ?? new Response("Not Found", { status: 404 });
   }
 };
