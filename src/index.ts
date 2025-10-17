@@ -16,7 +16,7 @@ const app = new App({
 });
 
 app.webhooks.on('issue_comment.created', async e => {
-  // if(e.payload.issue.url === ESBUILDENV.DASHBOARD_ISSUE_URL) {
+  if(e.payload.issue.html_url === ESBUILDENV.DASHBOARD_ISSUE_URL && !e.payload.issue.performed_via_github_app) {
     // if(e.payload.comment.body)
     const res = await e.octokit.request(`POST /repos/{owner}/{repo}/issues/{issue_number}/comments`, {
       owner: e.payload.repository.owner.login,
@@ -28,7 +28,7 @@ app.webhooks.on('issue_comment.created', async e => {
     if(res.status !== 201) {
       throw new Error(`response status is not 200: ${res.status}`);
     }
-  // }
+  }
 });
 
 const middleware = createWebMiddleware(app);
