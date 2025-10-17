@@ -18,12 +18,16 @@ const app = new App({
 app.webhooks.on('issue_comment.created', async e => {
   if(e.payload.issue.url === ESBUILDENV.DASHBOARD_ISSUE_URL) {
     // if(e.payload.comment.body)
-    await e.octokit.request(`POST /repos/{owner}/{repo}/issues/{issue_number}/comments`, {
+    const res = await e.octokit.request(`POST /repos/{owner}/{repo}/issues/{issue_number}/comments`, {
       owner: e.payload.repository.owner.login,
       repo: e.payload.repository.name,
       issue_number: e.payload.issue.number,
       body: 'pong!',
     });
+    console.log(res.data);
+    if(res.status !== 201) {
+      throw new Error(`response status is not 200: ${res.status}`);
+    }
   }
 });
 
