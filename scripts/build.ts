@@ -14,10 +14,10 @@ const getEnv = (key: string) => {
   return v;
 }
 
-const envDefs: Record<keyof typeof ESBUILDENV, string> = {
-  APPID: getEnv('APPID'),
-  PRIVATE_KEY: getEnv('PRIVATE_KEY'),
-  WEBHOOK_SECRET: getEnv('WEBHOOK_SECRET'),
+const envDefs: Record<`ESBUILDENV.${keyof typeof ESBUILDENV}`, string> = {
+  'ESBUILDENV.APPID': getEnv('APPID'),
+  'ESBUILDENV.PRIVATE_KEY': `"${getEnv('PRIVATE_KEY')}"`,
+  'ESBUILDENV.WEBHOOK_SECRET': `"${getEnv('WEBHOOK_SECRET')}"`,
 };
 
 await build({
@@ -25,13 +25,13 @@ await build({
   minify: true,
   bundle: true,
   outfile: 'dist/index.js',
-  platform: 'neutral',
+  platform: 'browser',
   format: 'esm',
   define: {
     ...envDefs,
   },
   // logLevel: 'verbose',
-  external: ['node:buffer', 'node:crypto'],
+  // external: ['node:buffer', 'node:crypto'],
 });
 
 export {};
