@@ -16,6 +16,8 @@ const app = new App({
 });
 
 app.webhooks.on('issue_comment.created', async e => {
+  return
+  // FIXME: performed_via_github_app filter is not working...?
   if(e.payload.issue.html_url === ESBUILDENV.DASHBOARD_ISSUE_URL && !e.payload.issue.performed_via_github_app) {
     // if(e.payload.comment.body)
     const res = await e.octokit.request(`POST /repos/{owner}/{repo}/issues/{issue_number}/comments`, {
