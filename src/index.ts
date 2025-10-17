@@ -8,6 +8,11 @@ const app = new App({
   webhooks: {
     secret: ESBUILDENV.WEBHOOK_SECRET,
   },
+  // https://github.com/octokit/octokit.js/issues/2211
+  oauth: {
+    clientId: '',
+    clientSecret: '',
+  }
 });
 
 app.webhooks.on('issue_comment.created', e => {
