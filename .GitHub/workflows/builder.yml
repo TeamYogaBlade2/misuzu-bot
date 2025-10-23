@@ -1,0 +1,98 @@
+name: Builder
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        type: string
+        description: 'repository url'
+        required: true
+      ref:
+        type: string
+        description: 'repository ref'
+        required: true
+      prefix:
+        type: string
+        description: 'cache prefix'
+        required: true
+      apt:
+        type: string
+        description: 'apt packages'
+        required: true
+      cmd:
+        type: string
+        description: 'build command'
+        required: true
+      tmate:
+        type: boolean
+        description: 'SSH debug'
+        required: false
+        default: false
+
+env:
+  CCACHE_DIR: "/dev/shm/ccache"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: mxschmitt/action-tmate@v3
+        if: ${{ inputs.tmate }}
+        with:
+          detached: true
+
+      - name: Env cache (restore)
+        id: cache
+        # uses: actions/cache/restore@v4
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./
+            /dev/shm/ccache
+          key: cache-${{ inputs.prefix }}
+          restore-keys: env-cache-
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.ref }}
+          submodules: recursive
+
+      - name: Setup env
+        run: |
+          mkdir -p /dev/shm/ccache
+          sudo apt install ccache ${{ inputs.apt }}
+          ccache -M 5G
+          ccache -z
+
+      - name: Build
+        run: ${{ inputs.cmd }}
+        env:
+          # MAKEJOBS: '-j6'
+          USE_CCACHE: "1"
+
+      # - name: Release
+      #   run: gh release create "build-$(date +%Y-%m-%d-%H-%M-%S)" build_result.tar.gz
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+
+      - name: Ccache statistics
+        if: ${{ !cancelled() }}
+        run: ccache -sv
+
+      - name: Clean Repository
+        if: ${{ !cancelled() }}
+        run: |
+          git clean -ffdx
+          git reset --hard HEAD
+
+      # - name: Env cache (save)
+      #   if: ${{ !cancelled() }}
+      #   uses: actions/cache/save@v4
+      #   with:
+      #     path: |
+      #       ./
+      #       /dev/shm/ccache
+      #     key: cache-${{ inputs.prefix }}
