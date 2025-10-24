@@ -1,2 +1,0 @@
-patchedDependencies:
-  '@octokit/app': patches/@octokit__app.patch
