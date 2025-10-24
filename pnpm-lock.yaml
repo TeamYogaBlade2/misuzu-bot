@@ -11,6 +11,9 @@ importers:
       '@octokit/app':
         specifier: ^16.1.1
         version: 16.1.1
+      '@octokit/webhooks':
+        specifier: ^14.1.3
+        version: 14.1.3
     devDependencies:
       esbuild:
         specifier: ^0.25.11

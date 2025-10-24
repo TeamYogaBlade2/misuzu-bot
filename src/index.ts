@@ -1,6 +1,7 @@
 // SPDX-License-Identifier:  AGPL-3.0-or-later
 
-import { App, createWebMiddleware } from '@octokit/app';
+import { App } from '@octokit/app';
+import { createWebMiddleware } from '@octokit/webhooks';
 
 const app = new App({
   appId: ESBUILDENV.APPID,
@@ -33,7 +34,7 @@ app.webhooks.on('issue_comment.created', async e => {
   }
 });
 
-const middleware = createWebMiddleware(app);
+const middleware = createWebMiddleware(app.webhooks);
 
 export default {
   async fetch(req: Request): Promise<Response|undefined> {
