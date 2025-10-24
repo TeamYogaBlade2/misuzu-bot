@@ -34,6 +34,58 @@ app.webhooks.on('issue_comment.created', async e => {
   }
 });
 
+const buildRepos: Record<string, {
+  apt: string,
+  cmd: string,
+  getPrefix: () => string,
+}> = {
+  'linux': {
+    apt: 'gcc-arm-none-eabi',
+    cmd: 'ARCH=arm CROSS_COMPILE=arm-none-eabi- make lenovo-blade_defconfig all',
+    getPrefix() {
+      return 'mainline-linux'
+    },
+  }
+};
+
+app.webhooks.on('push', async e => {
+  // const repo = e.payload.repository.full_name.split('/');
+  const owner = 'TeamYogaBlade2';
+  const repo = e.payload.repository.name;
+  // const ref = e.payload.ref;
+  const commit = e.payload.after;
+
+  const recipe = buildRepos[repo]
+  if(!recipe) {
+    return
+  }
+
+  await e.octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+    owner,
+    repo: 'misuzu-bot',
+    workflow_id: 'builder.yml',
+    ref: 'main',
+    inputs: {
+      repo: owner + '/' + repo,
+      ref: commit,
+      prefix: recipe.getPrefix(),
+      apt: recipe.apt,
+      cmd: recipe.cmd,
+    },
+  });
+});
+
+app.webhooks.on('workflow_dispatch', async e => {
+
+  await e.octokit.request('POST /repos/{owner}/{repo}/statuses/{sha}', {
+    owner, repo,
+    sha: commit,
+    state: 'pending',
+    target_url: 'https://github.com/TeamYogaBlade2/misuzu-bot/actions/workflows/builder.yml', // FIXME: Get the actual run url
+    context: 'TODO',
+  });
+});
+
 const middleware = createWebMiddleware(app.webhooks);
 
 export default {
