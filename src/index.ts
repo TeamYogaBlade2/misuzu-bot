@@ -48,6 +48,7 @@ const buildRepos: Record<string, {
   }
 };
 
+/*
 app.webhooks.on('push', async e => {
   // const repo = e.payload.repository.full_name.split('/');
   const owner = 'TeamYogaBlade2';
@@ -85,6 +86,7 @@ app.webhooks.on('workflow_dispatch', async e => {
     context: 'TODO',
   });
 });
+*/
 
 const middleware = createWebMiddleware(app.webhooks);
 
